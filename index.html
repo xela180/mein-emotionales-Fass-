@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f5f0e6">
+<title>Das emotionale Fass</title>
+<style>
+:root{--ink:#273246;--muted:#697386;--paper:#fbf8f1;--card:#fff;--line:#e5e0d6;--gold:#d6a72b;--green:#72ad83;--yellow:#f1d66b;--orange:#e99a45;--red:#cf646b;--shadow:0 5px 20px #26324610}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{background:var(--gold);padding:18px 18px 20px;color:white}
+header .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em}
+header h1{font-size:25px;line-height:1.15;margin:7px 0 5px}
+header p{margin:0;font-size:14px;opacity:.95}
+main{max-width:760px;margin:auto;padding:15px 13px 38px}
+nav{display:flex;gap:8px;overflow:auto;padding:2px 0 12px}
+nav button{white-space:nowrap;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:10px 14px;font-weight:650}
+nav button.active{background:var(--ink);color:white;border-color:var(--ink)}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:16px;margin:0 0 13px;box-shadow:var(--shadow)}
+h2{font-size:19px;margin:0 0 5px}h3{font-size:15px;margin:0 0 10px}
+.sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+label{display:block;font-size:13px;font-weight:650;margin:9px 0 5px}
+input,textarea,select{width:100%;border:1px solid #d8dce3;border-radius:10px;padding:11px 12px;background:white;color:var(--ink);font:inherit}
+textarea{min-height:74px;resize:vertical}
+.row{display:grid;grid-template-columns:115px 1fr;gap:9px}
+button{font:inherit;cursor:pointer}
+.primary,.secondary,.danger{border:0;border-radius:11px;padding:11px 14px;font-weight:700}
+.primary{background:var(--ink);color:white}.secondary{background:#f0ede6;color:var(--ink)}.danger{background:#fff0f0;color:#a83e48}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.entry{border:1px solid var(--line);border-radius:13px;padding:12px;margin:10px 0;background:#fff}
+.entrytop{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.entrytop strong{font-size:14px}
+.entry p{margin:7px 0 0;white-space:pre-wrap;font-size:14px}
+.small{font-size:12px;color:var(--muted)}
+.checkpoint{margin:14px 0 0;padding:13px;border-radius:13px;background:#fcfbf8;border:1px solid var(--line)}
+.checkhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pct{font-size:22px;font-weight:800}
+.bar{height:13px;border-radius:20px;background:#eee;overflow:hidden;margin:11px 0 5px}
+.fill{height:100%;width:0;border-radius:20px;transition:width .15s}
+.colorname{font-size:12px;color:var(--muted)}
+.colorlegend{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.legend{font-size:11px;border-radius:20px;padding:5px 9px;background:#f5f5f5}
+.green{background:var(--green)}.yellow{background:var(--yellow)}.orange{background:var(--orange)}.red{background:var(--red)}
+.legend.green{background:#e6f2e9}.legend.yellow{background:#fbf4d4}.legend.orange{background:#fbead9}.legend.red{background:#f8e4e5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:5px 15px 20px}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
+@media(max-width:420px){.row{grid-template-columns:1fr 1fr}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">DEIN TAGESPROTOKOLL</div><h1>Das emotionale Fass</h1><p>Wahrnehmen, was mich füllt – und was mir guttut.</p></header>
+<main>
+  <div class="card">
+    <label for="day">Tagebuchdatum</label>
+    <div class="row"><input id="day" type="date"><button class="secondary" id="today">Heute</button></div>
+    <p class="small" id="saved">Deine Einträge werden automatisch in diesem Browser gespeichert.</p>
+  </div>
+  <nav>
+    <button class="active" data-tab="situations">Situationen</button>
+    <button data-tab="level">Füllstand</button>
+    <button data-tab="conclusion">Tagesfazit</button>
+  </nav>
+  <section class="panel active" id="situations">
+    <div class="card">
+      <h2>Situationen im Tagesverlauf</h2>
+      <p class="sub">Halte fest, was etwas in dir ausgelöst hat – Stress, Streit, Gespräche, Freude und schöne Momente.</p>
+      <div class="row"><div><label for="eventTime">Uhrzeit</label><input id="eventTime" type="time"></div><div><label for="eventFeeling">Gefühl / Emotion</label><input id="eventFeeling" placeholder="z. B. Ärger, Freude …"></div></div>
+      <label for="eventText">Was ist passiert?</label><textarea id="eventText" placeholder="Beschreibe kurz die Situation …"></textarea>
+      <div class="actions"><button class="primary" id="addEvent">+ Situation hinzufügen</button></div>
+    </div>
+    <div class="card"><h3>Meine heutigen Situationen</h3><div id="events"><p class="small">Noch keine Situationen eingetragen.</p></div></div>
+  </section>
+  <section class="panel" id="level">
+    <div class="card">
+      <h2>Füllstand meines emotionalen Fasses</h2>
+      <p class="sub">Drei kurze Check-ins: Wie voll ist mein Fass gerade?</p>
+      <div class="small">0 % = ganz leer · 50 % = halb voll · 100 % = kurz vor dem Überlaufen</div>
+      <div id="checkpoints"></div>
+      <div class="colorlegend">
+        <span class="legend green">Grün · ruhig</span><span class="legend yellow">Gelb · zunehmend voll</span><span class="legend pink">Orange · stark gefüllt</span><span class="legend red">Rot · fast übervoll</span>
+      </div>
+    </div>
+  </section>
+  <section class="panel" id="conclusion">
+    <div class="card">
+      <h2>Mein Fazit des Tages</h2>
+      <p class="sub">Nimm dir am Ende des Tages einen Moment Zeit für deinen Rückblick.</p>
+      <label for="filled">Was hat mein emotionales Fass heute besonders gefüllt?</label><textarea id="filled" data-conclusion="filled"></textarea>
+      <label for="helped">Was hätte mir in diesen Situationen gutgetan oder geholfen?</label><textarea id="helped" data-conclusion="helped"></textarea>
+      <label for="learning">Welche Erkenntnis nehme ich aus diesem Tag mit?</label><textarea id="learning" data-conclusion="learning"></textarea>
+      <label for="tomorrow">Was möchte ich morgen anders machen oder mir Gutes tun?</label><textarea id="tomorrow" data-conclusion="tomorrow"></textarea>
+      <p class="small">Ich darf wahrnehmen, was in mir los ist – ohne mich dafür zu verurteilen. ❤️</p>
+    </div>
+  </section>
+  <div class="card">
+    <h3>Dein Tagebuch sichern</h3>
+    <p class="sub">Die Einträge bleiben in diesem Browser auf diesem Gerät. Exportiere regelmäßig eine Sicherung.</p>
+    <div class="actions"><button class="secondary" id="export">Tagebuch sichern (JSON)</button><button class="secondary" id="copy">Tagesjournal kopieren</button><label class="secondary" style="display:inline-flex;align-items:center;cursor:pointer">Sicherung importieren <input id="importFile" type="file" accept="application/json" hidden></label></div>
+    <p class="small" id="backupStatus"></p>
+  </div>
+</main>
+<footer>Dein persönliches Tagesprotokoll · Die Daten werden nicht an einen Server gesendet.</footer>
+<script>
+const $=id=>document.getElementById(id);
+const keys=['filled','helped','learning','tomorrow'];
+const labels={filled:'Was hat mein Fass gefüllt?',helped:'Was hätte mir geholfen?',learning:'Meine Erkenntnis',tomorrow:'Für morgen'};
+const slots=[['Morgens','morning'],['Mittags / nachmittags','midday'],['Abends','evening']];
+let db={};
+const todayStr=()=>{let d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
+function blank(){return {events:[],checks:{morning:{time:'',pct:''},midday:{time:'',pct:''},evening:{time:'',pct:''}},conclusion:{filled:'',helped:'',learning:'',tomorrow:''}}}
+function current(){let d=$('day').value;if(!db[d])db[d]=blank();return db[d]}
+function save(){let d=$('day').value;if(!d)return;localStorage.setItem('emotionalesFassDB',JSON.stringify(db));$('saved').textContent='Automatisch gespeichert · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});}
+function loadDB(){try{db=JSON.parse(localStorage.getItem('emotionalesFassDB')||'{}')}catch(e){db={}}}
+function colorFor(n){if(n===''||n===null||n===undefined)return {name:'Noch kein Wert',cls:''};n=Number(n);return n<40?{name:'Grün · ruhig',cls:'green'}:n<65?{name:'Gelb · zunehmend voll',cls:'yellow'}:n<85?{name:'Orange · stark gefüllt',cls:'pink'}:{name:'Rot · fast übervoll',cls:'red'}}
+function render(){
+ let data=current();
+ $('events').innerHTML='';
+ if(!data.events.length)$('events').innerHTML='<p class="small">Noch keine Situationen eingetragen.</p>';
+ data.events.forEach((e,i)=>{let div=document.createElement('div');div.className='entry';let top=document.createElement('div');top.className='entrytop';let strong=document.createElement('strong');strong.textContent=(e.time||'Ohne Uhrzeit')+(e.feeling?' · '+e.feeling:'');let del=document.createElement('button');del.className='danger';del.textContent='Löschen';del.onclick=()=>{current().events.splice(i,1);save();render()};top.append(strong,del);div.append(top);let p=document.createElement('p');p.textContent=e.text;div.append(p);$('events').append(div)});
+ $('checkpoints').innerHTML='';
+ slots.forEach(([title,key])=>{let v=data.checks[key],col=colorFor(v.pct),wrap=document.createElement('div');wrap.className='checkpoint';wrap.innerHTML=`<div class="checkhead"><strong>${title}</strong><span class="pct">${v.pct===''?'–':v.pct+' %'}</span></div><div class="grid2"><div><label>Uhrzeit</label><input type="time" id="time_${key}" value="${v.time||''}"></div><div><label>Füllstand (0–100 %)</label><input type="number" id="pct_${key}" min="0" max="100" inputmode="numeric" placeholder="z. B. 65" value="${v.pct}"></div></div><div class="bar"><div class="fill ${col.cls}" style="width:${v.pct||0}%"></div></div><div class="colorname">${col.name}</div>`;$('checkpoints').append(wrap);
+ ['time','pct'].forEach(kind=>{$(''+kind+'_'+key).addEventListener('input',ev=>{let val=ev.target.value;if(kind==='pct'&&val!=='' ){val=Math.max(0,Math.min(100,Number(val)));ev.target.value=val}current().checks[key][kind]=val;save();if(kind==='pct')render()})});
+ });
+ keys.forEach(k=>{$(k).value=data.conclusion[k]||''});
+}
+$('day').value=todayStr();loadDB();render();
+$('today').onclick=()=>{$('day').value=todayStr();render()};
+$('day').onchange=()=>render();
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===b.dataset.tab))});
+$('addEvent').onclick=()=>{let text=$('eventText').value.trim();let feeling=$('eventFeeling').value.trim();if(!text&&!feeling){$('eventText').focus();return}current().events.push({time:$('eventTime').value,feeling,text});$('eventText').value='';$('eventFeeling').value='';save();render()};
+keys.forEach(k=>$(k).addEventListener('input',()=>{current().conclusion[k]=$(k).value;save()}));
+$('export').onclick=()=>{let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='emotionales-fass-sicherung.json';a.click();URL.revokeObjectURL(a.href);$('backupStatus').textContent='Sicherung wurde erstellt.'};
+$('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let incoming=JSON.parse(await f.text());db={...db,...incoming};save();render();$('backupStatus').textContent='Sicherung importiert.'}catch(err){$('backupStatus').textContent='Datei konnte nicht gelesen werden.'}};
+$('copy').onclick=async()=>{let d=$('day').value,data=current(),lines=['Das emotionale Fass – '+d,'','Situationen:',...data.events.map(e=>`${e.time||''} ${e.feeling||''}: ${e.text}`),'','Füllstände:',...slots.map(([t,k])=>`${t}: ${data.checks[k].time||'–'} · ${data.checks[k].pct===''?'kein Wert':data.checks[k].pct+' %'}`),'','Tagesfazit:',...keys.map(k=>labels[k]+'\n'+(data.conclusion[k]||'–'))].join('\n');try{await navigator.clipboard.writeText(lines);$('backupStatus').textContent='Tagesjournal in die Zwischenablage kopiert.'}catch(e){$('backupStatus').textContent=lines;}}
+</script>
+</body></html>
