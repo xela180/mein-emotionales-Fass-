@@ -98,6 +98,11 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
       <p class="small">Ich darf wahrnehmen, was in mir los ist – ohne mich dafür zu verurteilen. ❤️</p>
     </div>
   </section>
+  <div class="card" id="archiveCard">
+    <h3>Gespeicherte Tage</h3>
+    <p class="sub">Hier findest du alle Tage, an denen du etwas eingetragen hast. Mit „Öffnen“ kannst du sie jederzeit wieder lesen und bearbeiten.</p>
+    <div id="dayArchive"><p class="small">Noch keine gespeicherten Tage.</p></div>
+  </div>
   <div class="card">
     <h3>Deine Einträge speichern und sichern</h3>
     <p class="sub">Speichere den ausgewählten Tag als lesbare Textdatei. Die JSON-Datei ist zusätzlich die technische Sicherung für alle Tage.</p>
@@ -115,7 +120,27 @@ let db={};
 const todayStr=()=>{let d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
 function blank(){return {events:[],checks:{morning:{time:'',pct:''},midday:{time:'',pct:''},evening:{time:'',pct:''}},conclusion:{filled:'',helped:'',learning:'',tomorrow:''}}}
 function current(){let d=$('day').value;if(!db[d])db[d]=blank();return db[d]}
-function save(){let d=$('day').value;if(!d)return;localStorage.setItem('emotionalesFassDB',JSON.stringify(db));$('saved').textContent='Automatisch gespeichert · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});}
+function save(){let d=$('day').value;if(!d)return;localStorage.setItem('emotionalesFassDB',JSON.stringify(db));$('saved').textContent='Automatisch gespeichert · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});renderArchive();}
+function renderArchive(){
+ const archive=$('dayArchive');
+ if(!archive)return;
+ const dates=Object.keys(db).filter(date=>{
+   const d=db[date]||{};
+   return (d.events&&d.events.length) ||
+     (d.checks&&Object.values(d.checks).some(v=>v&&(v.time||v.pct!==''))) ||
+     (d.conclusion&&Object.values(d.conclusion).some(v=>String(v||'').trim()));
+ }).sort((a,b)=>b.localeCompare(a));
+ archive.innerHTML='';
+ if(!dates.length){archive.innerHTML='<p class="small">Noch keine gespeicherten Tage.</p>';return;}
+ dates.forEach(date=>{
+   const row=document.createElement('div');row.className='entry entrytop';
+   const label=document.createElement('strong');
+   label.textContent=new Date(date+'T12:00:00').toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'});
+   const open=document.createElement('button');open.className='secondary';open.textContent='Öffnen';
+   open.onclick=()=>{$('day').value=date;render();window.scrollTo({top:0,behavior:'smooth'});};
+   row.append(label,open);archive.append(row);
+ });
+}
 function loadDB(){try{db=JSON.parse(localStorage.getItem('emotionalesFassDB')||'{}')}catch(e){db={}}}
 function colorFor(n){if(n===''||n===null||n===undefined)return {name:'Noch kein Wert',cls:''};n=Number(n);return n<40?{name:'Grün · ruhig',cls:'green'}:n<65?{name:'Gelb · zunehmend voll',cls:'yellow'}:n<85?{name:'Rosa · stark gefüllt',cls:'pink'}:{name:'Rot · fast übervoll',cls:'red'}}
 function render(){
@@ -129,7 +154,7 @@ function render(){
  });
  keys.forEach(k=>{$(k).value=data.conclusion[k]||''});
 }
-$('day').value=todayStr();loadDB();render();
+$('day').value=todayStr();loadDB();render();renderArchive();
 $('today').onclick=()=>{$('day').value=todayStr();render()};
 function shiftDay(amount){const d=new Date($('day').value+'T12:00:00');d.setDate(d.getDate()+amount);$('day').value=d.toISOString().slice(0,10);render()}
 $('previousDay').onclick=()=>shiftDay(-1);
