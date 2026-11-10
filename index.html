@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#f5f0e6">
 <title>Das emotionale Fass</title>
 <style>
-:root{--ink:#273246;--muted:#697386;--paper:#fbf8f1;--card:#fff;--line:#e5e0d6;--gold:#d6a72b;--green:#72ad83;--yellow:#f1d66b;--orange:#e99a45;--red:#cf646b;--shadow:0 5px 20px #26324610}
+:root{--ink:#273246;--muted:#697386;--paper:#fbf8f1;--card:#fff;--line:#e5e0d6;--gold:#d6a72b;--green:#72ad83;--yellow:#f1d66b;--pink:#d98cae;--red:#cf646b;--shadow:0 5px 20px #26324610}
 *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 header{background:var(--gold);padding:18px 18px 20px;color:white}
 header .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em}
@@ -24,6 +24,8 @@ label{display:block;font-size:13px;font-weight:650;margin:9px 0 5px}
 input,textarea,select{width:100%;border:1px solid #d8dce3;border-radius:10px;padding:11px 12px;background:white;color:var(--ink);font:inherit}
 textarea{min-height:74px;resize:vertical}
 .row{display:grid;grid-template-columns:115px 1fr;gap:9px}
+.date-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;margin-top:8px}
+.date-nav button{padding:9px 10px;font-size:13px}
 button{font:inherit;cursor:pointer}
 .primary,.secondary,.danger{border:0;border-radius:11px;padding:11px 14px;font-weight:700}
 .primary{background:var(--ink);color:white}.secondary{background:#f0ede6;color:var(--ink)}.danger{background:#fff0f0;color:#a83e48}
@@ -41,8 +43,8 @@ button{font:inherit;cursor:pointer}
 .colorname{font-size:12px;color:var(--muted)}
 .colorlegend{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .legend{font-size:11px;border-radius:20px;padding:5px 9px;background:#f5f5f5}
-.green{background:var(--green)}.yellow{background:var(--yellow)}.orange{background:var(--orange)}.red{background:var(--red)}
-.legend.green{background:#e6f2e9}.legend.yellow{background:#fbf4d4}.legend.orange{background:#fbead9}.legend.red{background:#f8e4e5}
+.green{background:var(--green)}.yellow{background:var(--yellow)}.pink{background:var(--pink)}.red{background:var(--red)}
+.legend.green{background:#e6f2e9}.legend.yellow{background:#fbf4d4}.legend.pink{background:#f8e8ef}.legend.red{background:#f8e4e5}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 footer{text-align:center;color:var(--muted);font-size:12px;padding:5px 15px 20px}
 hr{border:0;border-top:1px solid var(--line);margin:14px 0}
@@ -55,6 +57,8 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
   <div class="card">
     <label for="day">Tagebuchdatum</label>
     <div class="row"><input id="day" type="date"><button class="secondary" id="today">Heute</button></div>
+    <div class="date-nav"><button class="secondary" id="previousDay">← Vortag</button><span></span><button class="secondary" id="nextDay">Folgetag →</button></div>
+    <p class="small">Wähle ein früheres Datum, um deine damaligen Einträge wieder anzusehen. Deine Tage bleiben erhalten.</p>
     <p class="small" id="saved">Deine Einträge werden automatisch in diesem Browser gespeichert.</p>
   </div>
   <nav>
@@ -79,7 +83,7 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
       <div class="small">0 % = ganz leer · 50 % = halb voll · 100 % = kurz vor dem Überlaufen</div>
       <div id="checkpoints"></div>
       <div class="colorlegend">
-        <span class="legend green">Grün · ruhig</span><span class="legend yellow">Gelb · zunehmend voll</span><span class="legend pink">Orange · stark gefüllt</span><span class="legend red">Rot · fast übervoll</span>
+        <span class="legend green">Grün · ruhig</span><span class="legend yellow">Gelb · zunehmend voll</span><span class="legend pink">Rosa · stark gefüllt</span><span class="legend red">Rot · fast übervoll</span>
       </div>
     </div>
   </section>
@@ -95,9 +99,9 @@ hr{border:0;border-top:1px solid var(--line);margin:14px 0}
     </div>
   </section>
   <div class="card">
-    <h3>Dein Tagebuch sichern</h3>
-    <p class="sub">Die Einträge bleiben in diesem Browser auf diesem Gerät. Exportiere regelmäßig eine Sicherung.</p>
-    <div class="actions"><button class="secondary" id="export">Tagebuch sichern (JSON)</button><button class="secondary" id="copy">Tagesjournal kopieren</button><label class="secondary" style="display:inline-flex;align-items:center;cursor:pointer">Sicherung importieren <input id="importFile" type="file" accept="application/json" hidden></label></div>
+    <h3>Deine Einträge speichern und sichern</h3>
+    <p class="sub">Speichere den ausgewählten Tag als lesbare Textdatei. Die JSON-Datei ist zusätzlich die technische Sicherung für alle Tage.</p>
+    <div class="actions"><button class="primary" id="exportDay">Ausgewählten Tag als Text speichern</button><button class="secondary" id="export">Alle Tage sichern (JSON)</button><button class="secondary" id="copy">Tagesjournal kopieren</button><label class="secondary" style="display:inline-flex;align-items:center;cursor:pointer">JSON-Sicherung importieren <input id="importFile" type="file" accept="application/json" hidden></label></div>
     <p class="small" id="backupStatus"></p>
   </div>
 </main>
@@ -113,7 +117,7 @@ function blank(){return {events:[],checks:{morning:{time:'',pct:''},midday:{time
 function current(){let d=$('day').value;if(!db[d])db[d]=blank();return db[d]}
 function save(){let d=$('day').value;if(!d)return;localStorage.setItem('emotionalesFassDB',JSON.stringify(db));$('saved').textContent='Automatisch gespeichert · '+new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});}
 function loadDB(){try{db=JSON.parse(localStorage.getItem('emotionalesFassDB')||'{}')}catch(e){db={}}}
-function colorFor(n){if(n===''||n===null||n===undefined)return {name:'Noch kein Wert',cls:''};n=Number(n);return n<40?{name:'Grün · ruhig',cls:'green'}:n<65?{name:'Gelb · zunehmend voll',cls:'yellow'}:n<85?{name:'Orange · stark gefüllt',cls:'pink'}:{name:'Rot · fast übervoll',cls:'red'}}
+function colorFor(n){if(n===''||n===null||n===undefined)return {name:'Noch kein Wert',cls:''};n=Number(n);return n<40?{name:'Grün · ruhig',cls:'green'}:n<65?{name:'Gelb · zunehmend voll',cls:'yellow'}:n<85?{name:'Rosa · stark gefüllt',cls:'pink'}:{name:'Rot · fast übervoll',cls:'red'}}
 function render(){
  let data=current();
  $('events').innerHTML='';
@@ -127,12 +131,21 @@ function render(){
 }
 $('day').value=todayStr();loadDB();render();
 $('today').onclick=()=>{$('day').value=todayStr();render()};
+function shiftDay(amount){const d=new Date($('day').value+'T12:00:00');d.setDate(d.getDate()+amount);$('day').value=d.toISOString().slice(0,10);render()}
+$('previousDay').onclick=()=>shiftDay(-1);
+$('nextDay').onclick=()=>shiftDay(1);
 $('day').onchange=()=>render();
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===b.dataset.tab))});
 $('addEvent').onclick=()=>{let text=$('eventText').value.trim();let feeling=$('eventFeeling').value.trim();if(!text&&!feeling){$('eventText').focus();return}current().events.push({time:$('eventTime').value,feeling,text});$('eventText').value='';$('eventFeeling').value='';save();render()};
 keys.forEach(k=>$(k).addEventListener('input',()=>{current().conclusion[k]=$(k).value;save()}));
+function dayText(date,data){
+ const lines=['DAS EMOTIONALE FASS','Tagesbericht vom '+new Date(date+'T12:00:00').toLocaleDateString('de-DE'),'', 'SITUATIONEN', ...(data.events.length?data.events.map(e=>`${e.time||'Ohne Uhrzeit'}${e.feeling?' · '+e.feeling:''}\n${e.text||''}`):['Keine Situationen eingetragen.']), '', 'FÜLLSTÄNDE', ...slots.map(([title,key])=>{const v=data.checks[key];return `${title}: ${v.time||'keine Uhrzeit'} · ${v.pct===''?'kein Wert':v.pct+' %'}`;}), '', 'TAGESFAZIT', ...keys.map(k=>labels[k]+'\n'+(data.conclusion[k]||'Keine Angabe.'))];
+ return lines.join('\n');
+}
+function downloadFile(content,type,filename){const blob=new Blob([content],{type});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+$('exportDay').onclick=()=>{const date=$('day').value;downloadFile(dayText(date,current()),'text/plain;charset=utf-8',`emotionales-fass-${date}.txt`);$('backupStatus').textContent='Der lesbare Tagesbericht wurde gespeichert.'};
 $('export').onclick=()=>{let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='emotionales-fass-sicherung.json';a.click();URL.revokeObjectURL(a.href);$('backupStatus').textContent='Sicherung wurde erstellt.'};
 $('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let incoming=JSON.parse(await f.text());db={...db,...incoming};save();render();$('backupStatus').textContent='Sicherung importiert.'}catch(err){$('backupStatus').textContent='Datei konnte nicht gelesen werden.'}};
-$('copy').onclick=async()=>{let d=$('day').value,data=current(),lines=['Das emotionale Fass – '+d,'','Situationen:',...data.events.map(e=>`${e.time||''} ${e.feeling||''}: ${e.text}`),'','Füllstände:',...slots.map(([t,k])=>`${t}: ${data.checks[k].time||'–'} · ${data.checks[k].pct===''?'kein Wert':data.checks[k].pct+' %'}`),'','Tagesfazit:',...keys.map(k=>labels[k]+'\n'+(data.conclusion[k]||'–'))].join('\n');try{await navigator.clipboard.writeText(lines);$('backupStatus').textContent='Tagesjournal in die Zwischenablage kopiert.'}catch(e){$('backupStatus').textContent=lines;}}
+$('copy').onclick=async()=>{const lines=dayText($('day').value,current());try{await navigator.clipboard.writeText(lines);$('backupStatus').textContent='Tagesjournal in die Zwischenablage kopiert.'}catch(e){$('backupStatus').textContent='Kopieren ist in diesem Browser nicht verfügbar. Nutze bitte „Ausgewählten Tag als Text speichern“. '}}
 </script>
 </body></html>
